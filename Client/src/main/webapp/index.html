@@ -1,0 +1,675 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta charset="utf-8">
+    <title>Élection M1IF03</title>
+
+
+    <link rel="stylesheet" href="static/css/styles.css" type="text/css" />
+
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.10.1/mdb.min.css" rel="stylesheet" />
+
+
+
+</head>
+<body>
+
+<div class="wrapper d-flex align-items-stretch" style="background-color: #ecf0f1; height: 100vh;">
+
+    <nav id="sidebar" class="active">
+        <div id="ifNotConnected">
+            <h1><a href="index.html" class="logo">M.</a></h1>
+            <ul class="list-unstyled components mb-5">
+                <li class="active">
+                    <a href="#index"><span class="fa fa-home"></span> Home</a>
+                </li>
+                <li>
+                    <a href="#candidats"><span class="fa fa-sticky-note"></span> Candidates</a>
+                </li>
+                <li id="log">
+                    <a type="button" class="btn btn-primary mt-4" href="#connect"><span class="fas fa-sign-in-alt"></span>Login</a>
+                </li>
+            </ul>
+        </div>
+
+
+        <div id="ifConnected">
+            <!--            <h1><a href="index.html" class="logo">M. Naguib</a></h1>-->
+            <script type="text/template" id="nameCompte">
+                {{#view}}
+                <h1><a href="index.html" class="logo">M. {{myName}}</a></h1>
+                {{/view}}
+            </script>
+            <div id="UserName"></div>
+            <ul  class="list-unstyled components mb-5">
+                <li class="active">
+                    <a href="#index"><span class="fa fa-home"></span> Home</a>
+                </li>
+                <li>
+                    <a href="#monCompte" onclick="getUser()"><span class="fa fa-user"></span> Profil</a>
+                </li>
+                <li>
+                    <a href="#candidats"><span class="fa fa-sticky-note"></span> Candidates</a>
+                </li>
+                <li>
+                    <a href="#vote"><span class="fa fa-paper-plane"></span> Vote</a>
+                </li>
+                <li>
+                    <a href="#ballot" onclick="getBallotByUser()"><span class="fas fa-check" ></span> Check my vote</a>
+                </li>
+            </ul>
+        </div>
+
+
+        <div class="footer">
+            <p>
+                <a>Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | MOHAMED MAHAMOUD Naguib </a>
+            </p>
+        </div>
+    </nav>
+
+
+    <!-- Page Content  -->
+    <div id="content" class="p-4 p-md-5">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container-fluid">
+
+                <button type="button" id="sidebarCollapse" class="btn btn-primary">
+                    <i class="fa fa-bars"></i>
+                    <span class="sr-only">Toggle Menu</span>
+                </button>
+
+                <button
+                        class="btn btn-dark d-inline-block d-lg-none ml-auto"
+                        type="button"
+                        data-mdb-toggle="collapse"
+                        data-mdb-target="#navbarNavAltMarkup"
+                        aria-controls="navbarNavAltMarkup"
+                        aria-expanded="false"
+                        aria-label="Toggle navigation"
+                >
+                    <i class="fas fa-bars"></i>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                    <ul class="nav navbar-nav ms-auto">
+                        <li class="nav-item active">
+                            <a class="nav-link" href="#index">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#candidats">Candidates</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+
+        <div id="liveAlertPlaceholder" class="container mt-4 mb-4"></div>
+        <!--    La section index pour afficher le tableau de resultats de votes-->
+
+        <section id="index" class="active">
+            <!-- Carousel wrapper -->
+            <div class="mb-4">
+                <h4 style="margin-top: 3rem">Welcome to the 2022 Great Election web application!</h4>
+                <p>Current election results:</p>
+            </div>
+            <div class=" d-flex align-items-center h-100" style="margin-top: 2rem;">
+                <div class="container-fluid">
+                    <div class="row justify-content-center">
+
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body p-0">
+                                    <div class="table-responsive table-scroll" data-mdb-perfect-scrollbar="true" style="position: relative; height: 500px">
+                                        <script type="text/template" id="mp_template">
+                                            <table class="table table-striped align-middle">
+                                                <thead class="table-dark">
+                                                <tr>
+                                                    <th scope="col">Names</th>
+                                                    <th scope="col">Votes</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                {{#listElection}}
+                                                <tr>
+                                                    <td>{{nomCandidat}}</td>
+                                                    <td>{{votes}}</td>
+                                                </tr>
+                                                {{/listElection}}
+                                                </tbody>
+                                            </table>
+                                        </script>
+                                        <div id="mypanel_election"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+
+
+
+        <!--        La section pour afficher les noms d'un candidat -->
+
+        <section id="candidats">
+            <div class="mb-4">
+                <h4 style="margin-top: 3rem">Here is the list of the different candidates</h4>
+            </div>
+            <div class=" d-flex align-items-center h-100" style="margin-top: 2rem;">
+                <div class="container-fluid">
+                    <div class="row justify-content-center">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body p-0">
+                                    <div class="table-responsive table-scroll" data-mdb-perfect-scrollbar="true" style="position: relative;">
+                                        <script type="text/template" id="template_cand">
+                                            <table class="table table-striped align-middle">
+                                                <thead class="table-dark">
+                                                <tr>
+                                                    <th scope="col">Names</th>
+                                                    <th scope="col">Actions</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                {{#listcandidat}}
+                                                <tr>
+                                                    <td>{{.}}</td>
+                                                    <td>
+                                                        <a type="button" href="#candidat/{{.}}" class="btn btn-primary btn-sm px-3" onclick="afficheCand(this);">
+                                                            <i class="fas fa-eye"></i>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                                {{/listcandidat}}
+                                                </tbody>
+                                            </table>
+                                        </script>
+                                        <div id="mypanel_cand"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+
+        <!--    La section pour compte user ( afficher les iformations d'un utilisateur) -->
+
+        <section id="monCompte" >
+            <script type="text/template" id="compteList">
+                {{#infoUser}}
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="card mb-4">
+                                <div class="card-body text-center">
+                                    <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3.png" alt="avatar" class="rounded-circle img-fluid" style="width: 150px;">
+                                    <h5 class="my-3" id="nameUser">{{nom}}</h5>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-8">
+                            <div class="card mb-4">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-sm-3">
+                                            <p class="mb-0">Login</p>
+                                        </div>
+                                        <div class="col-sm-9">
+                                            <p class="text-muted mb-0" id="login">{{login}}</p>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="row">
+                                        <div class="col-sm-3">
+                                            <p class="mb-0">Name</p>
+                                        </div>
+                                        <div class="col-sm-9">
+                                            <input class="text-muted mb-0" style=" border-top-style: hidden;
+                                                                              border-right-style: hidden;
+                                                                              border-left-style: hidden;
+                                                                              border-bottom-style: hidden;"
+                                                   type="text"  id="newName" contentEditable="true" name="nom2" onkeyup="changeName()" value="{{nom}}">
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="row">
+                                        <div class="col-sm-3">
+                                            <p class="mb-0">Administrator ?</p>
+                                        </div>
+                                        <div class="col-sm-9">
+                                            <p class="text-muted mb-0">{{admin}}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="card mb-4 mb-md-0">
+                                        <div class="card-body">
+                                            <div class="col-md-8" >
+                                                <label class="form-label">Change my name :</label>
+                                                <input type="text" class="form-control"  name="nom" id="changeName" onkeyup="changeName()">
+                                                <button type="button" class="btn btn-primary" style="margin-top: 1rem; margin-bottom: 1rem;" id="myBtn" data-mdb-toggle="modal"
+                                                        data-mdb-target="#updateNameModal">Modifier</button>
+                                            </div>
+                                            <a href="#deco" class="btn btn-dark" type="button" onclick="logout()">Logout</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{/infoUser}}
+            </script>
+
+            <div id="myPanelCompte"></div>
+
+        </section>
+
+
+        <!-- Modal -->
+        <div
+                class="modal fade"
+                id="updateNameModal"
+                tabindex="-1"
+                aria-labelledby="updateModalLabel"
+                aria-hidden="true"
+        >
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="updateModalLabel">Change Name</h5>
+                        <button
+                                type="button"
+                                class="btn-close"
+                                data-mdb-dismiss="modal"
+                                aria-label="Close"
+                        ></button>
+                    </div>
+                    <div class="modal-body">You are changing your name. Would you like to modify?</div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">
+                            Close
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="updateName()" data-mdb-dismiss="modal">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!--  Le formulaire pour se loger afin de voter aux éléctions   -->
+
+        <section id="connect">
+            <div class="container py-5 h-100">
+                <div class="row loginRow d-flex justify-content-center align-items-center h-100">
+                    <div class="col col-xl-10">
+                        <div class="card" style="border-radius: 1rem;">
+                            <div class="row g-0">
+                                <div class="col-md-6 col-lg-5 d-none d-md-block">
+                                    <img
+                                            src="static/img/Visuel-vote.jpg"
+                                            alt="login form"
+                                            class="img-fluid" style="border-radius: 1rem 0 0 1rem;"
+                                    />
+                                </div>
+                                <div class="col-md-6 col-lg-7 d-flex align-items-center">
+                                    <div class="card-body p-4 p-lg-5 text-black">
+
+                                        <form class="needs-validation" novalidate>
+
+                                            <div class="d-flex align-items-center mb-3 pb-1">
+                                                <i class="fas fa-cubes fa-2x me-3" style="color: #ff6219;"></i>
+                                                <span class="h1 fw-bold mb-0">Éléction M1IF03</span>
+                                            </div>
+
+                                            <h5 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Log in to be able to vote!</h5>
+
+                                            <div class="form-outline mb-4">
+                                                <input type="text" id="loginForm"  class="form-control form-control-lg" required />
+                                                <label class="form-label" for="loginForm">Login</label>
+                                                <div class="invalid-feedback">Please enter a login.</div>
+                                            </div>
+
+                                            <div class="form-outline mb-4">
+                                                <input type="text" id="nomForm" class="form-control form-control-lg" required />
+                                                <label class="form-label" for="nomForm">Name</label>
+                                                <div class="invalid-feedback">Please enter a name.</div>
+                                            </div>
+
+                                            <div class="form-outline mb-4">
+                                                <input class="form-check-input" type="checkbox" id="adminForm" >
+                                                <label class="form-check-label" for="adminForm">
+                                                    Are you an administrator ?
+                                                </label>
+                                            </div>
+
+                                            <div class="pt-1 mb-4">
+                                                <button class="btn btn-primary btn-lg btn-block" type="submit" onclick="loginFunct()">Login</button>
+                                            </div>
+                                        </form>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!--    La section pour afficher les noms d'un seul candidat-->
+
+        <section id="candidat">
+            <div class="container-fluid mt-5">
+                <!--                justify-content-center align-items-center-->
+                <div class="row d-flex justify-content-center align-items-center h-100">
+                    <div class="col col-xl-10">
+                        <div class="card" style="border-radius: 1rem;">
+                            <div class="card-header h3">Candidate Information</div>
+                            <div class="card-body">
+                                <!--                            <h5 class="card-title">Select a candidate :</h5>-->
+                                <div class="form-outline mb-4">
+                                    <script type="text/html" id="template_afficheC">
+                                        {{#nomsCandidat}}
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="card mb-0">
+                                                    <div class="card-body">
+                                                        <div class="row">
+                                                            <div class="col-sm-3">
+                                                                <p class="mb-0">First Name</p>
+                                                            </div>
+                                                            <div class="col-sm-9">
+                                                                <p class="text-muted mb-0">{{prenom}}</p>
+                                                            </div>
+                                                        </div>
+                                                        <hr>
+                                                        <div class="row">
+                                                            <div class="col-sm-3">
+                                                                <p class="mb-0">Last Name</p>
+                                                            </div>
+                                                            <div class="col-sm-9">
+                                                                <p class="text-muted mb-0">{{nom}}</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {{/nomsCandidat}}
+                                    </script>
+                                    <div id="infoCandidat" style="margin-bottom: 1rem;"></div>
+                                </div>
+                                <button type="button" href="#deco" class="btn btn-dark mt-4" onclick="logout()">Logout</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!--    La section pour voter -->
+
+        <section id="vote" >
+            <div class="container-fluid mt-5">
+                <!--                justify-content-center align-items-center-->
+                <div class="row d-flex justify-content-center align-items-center h-100">
+                    <div class="col col-xl-10">
+                        <div class="card" style="border-radius: 1rem;">
+                            <div class="card-header h3">Vote ! Voting is a right for every citizen.</div>
+                            <div class="card-body">
+                                <h5 class="card-title">Select a candidate :</h5>
+                                <div class="form-outline mb-4">
+                                    <script type="text/template" id="template_nom">
+                                        <select class="form-select" name="candidat" id="candidatBy" aria-label="Default select example">
+                                            {{#listcandidat}}
+                                            <option value="{{.}}">{{.}}</option>
+                                            {{/listcandidat}}
+                                        </select>
+                                    </script>
+                                    <div id="mypanel_nom" style="margin-bottom: 1rem;"></div>
+                                </div>
+                                <button type="button" class="btn btn-primary" onclick="vote()">Send your vote</button>
+                                <button type="button" href="#deco" class="btn btn-dark mt-4" onclick="logout()">Logout</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+
+
+        <div
+                class="modal fade"
+                id="VoteModal"
+                tabindex="-1"
+                aria-labelledby="exampleModalLabel"
+                aria-hidden="true"
+        >
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="VoteModalLabel">Information</h5>
+                        <button
+                                type="button"
+                                class="btn-close"
+                                data-mdb-dismiss="modal"
+                                aria-label="Close"
+                        ></button>
+                    </div>
+                    <div class="modal-body">You have already voted. Sorry !</div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary " data-mdb-dismiss="modal">
+                            OK
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!--        Pour demander la confirmation -->
+
+        <div
+                class="modal fade"
+                id="voteConfirmationModal"
+                tabindex="-1"
+                aria-labelledby="voteConfirModalLabel"
+                aria-hidden="true"
+        >
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="voteConfirModalLabel">Confirmation</h5>
+                        <button
+                                type="button"
+                                class="btn-close"
+                                data-mdb-dismiss="modal"
+                                aria-label="Close"
+                        ></button>
+                    </div>
+                    <div class="modal-body">You are sure to vote for this candidate.</div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-dark" data-mdb-dismiss="modal">
+                            Close
+                        </button>
+                        <button type="button" class="btn btn-primary"  onclick="voteFunct()" data-mdb-dismiss="modal">I confirm</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!--    La section pour supprimer un vote-->
+
+        <section id="ballot">
+            <div class="container-fluid mt-5">
+                <div class="row d-flex justify-content-center align-items-center h-100">
+                    <div class="col col-xl-10">
+                        <div class="card" style="border-radius: 1rem;">
+                            <div class="card-header h3">My proof of vote.</div>
+                            <div class="card-body">
+<!--                                <div id="affVoteNoR">-->
+<!--                                    <h5 class="card-title">You have not yet voted.</h5>-->
+<!--                                </div>-->
+
+                                <h5 class="card-title" id="affVote" >It's the information of your vote.</h5>
+                                <div class="form-outline mb-4">
+                                    <script type="text/template" id="template_vote">
+                                        {{#infoVote}}
+                                        <div class="row">
+                                            <div class="col-sm-3">
+                                                <p class="mb-0">Name votant</p>
+                                            </div>
+                                            <div class="col-sm-9">
+                                                <p class="text-muted mb-0">{{votant}}</p>
+                                            </div>
+                                        </div>
+                                        <hr>
+                                        <div class="row">
+                                            <div class="col-sm-3">
+                                                <p class="mb-0">Number vote</p>
+                                            </div>
+                                            <div class="col-sm-9">
+                                                <p class="text-muted mb-0" type="text">{{id}}</p>
+                                            </div>
+                                        </div>
+                                        {{/infoVote}}
+                                    </script>
+
+                                    <div id="myPanelVote" style="margin-bottom: 1rem;"></div>
+                                </div>
+                                <button type="button" class="btn btn-primary" onclick="deleteVote()" >Delete your vote</button>
+                                <button type="button" href="#deco" class="btn btn-dark mt-4" onclick="logout()">Logout</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div
+                    class="modal fade"
+                    id="deleteModal"
+                    tabindex="-1"
+                    aria-labelledby="exampleModalLabel"
+                    aria-hidden="true"
+            >
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="deleteModalLabel">Delete vote</h5>
+                            <button
+                                    type="button"
+                                    class="btn-close"
+                                    data-mdb-dismiss="modal"
+                                    aria-label="Close"
+                            ></button>
+                        </div>
+                        <div class="modal-body">Now you are deleting.</div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">
+                                Close
+                            </button>
+                            <button type="button" class="btn btn-primary" onclick="deleteVoteUser()" data-mdb-dismiss="modal">Are you sure to delete ?</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--            modal pour alerter user quand il veut supprimer alors qu'il n'a pas voté -->
+
+            <div
+                    class="modal fade"
+                    id="noVoteModal"
+                    tabindex="-1"
+                    aria-labelledby="noVoteModalLabel"
+                    aria-hidden="true"
+            >
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="noVoteModalLabel">Delete vote</h5>
+                            <button
+                                    type="button"
+                                    class="btn-close"
+                                    data-mdb-dismiss="modal"
+                                    aria-label="Close"
+                            ></button>
+                        </div>
+                        <div class="modal-body">Sorry, but you haven't voted yet, so you can't delete.</div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" data-mdb-dismiss="modal">
+                                Close
+                            </button>
+                            <!--                            <button type="button" class="btn btn-primary" onclick="deleteVoteUser()" data-mdb-dismiss="modal">Are you sure to delete ?</button>-->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </section>
+
+        <section id="havedConnected">
+            <div class="container-fluid mt-5">
+                <div class="row d-flex justify-content-center align-items-center h-100">
+                    <div class="col col-xl-10">
+                        <div class="card" style="border-radius: 1rem;">
+                            <div class="card-header h3" >You must to connecte to acces !</div>
+                            <div class="card-body">
+                                <h5 class="card-title">Page not found 404</h5>
+                                <div class="form-outline mb-4">
+                                    <!--                                    <p>Page not found 404</p>-->
+                                    <button type="button" href="#index" class="btn btn-dark mt-4" onclick="retour()">Back</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+
+
+
+<!-- MDB -->
+<script async  type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.10.1/mdb.min.js"></script>
+
+<!-- Mustache JS-->
+<script async   src="https://ajax.googleapis.com/ajax/libs/jquery/1.2.3/jquery.min.js"></script>
+<script async   src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/4.0.0/mustache.min.js" integrity="sha512-ZtynsaJmQRo6Ru0RHAPHnMfmTCLSTRcAoxbl5csw47H9EbEZWpns3URyVNgAvj6KQvEM6ysjTQZ3jj61go0NsQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script async  src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+<!--<script src="static/js/popper.js"></script>-->
+
+<script async defer  src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.2/umd/popper.min.js" integrity="sha512-2rNj2KJ+D8s1ceNasTIex6z4HWyOnEYLVC3FigGOmyQCZc2eBXKgOxQmo3oKLHyfcj53uz4QMsRCWNbLd32Q1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<script src="static/js/main.js" async ></script>
+<script src="static/js/scripts.js" async ></script>
+
+</body>
+</html>

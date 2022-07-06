@@ -1,0 +1,7 @@
+img.img-fluid, .img-thumbnail{
+    height: 100%;
+}
+
+div.loginRow{
+height: 40rem;
+}
